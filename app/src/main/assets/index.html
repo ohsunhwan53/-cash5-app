@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a2d25">
+<title>현금5억 · 주식 매수 체크</title>
+<style>
+:root { color-scheme:light; --dark:#0a2d25;--green:#126b50;--mint:#eaf6ef;--gold:#edc66e;--bg:#f5f7f6;--line:#e0e8e3;--text:#152e27;--muted:#63746e;--red:#b22931;--pink:#fff0f0;--amber:#8d5d13;--cream:#fff8e7; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; color:var(--text); background:var(--bg); font-family:-apple-system, BlinkMacSystemFont, 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; font-size:15px; line-height:1.5; }
+header { color:#fff; background:linear-gradient(150deg,#092e25,#145840); padding:28px 20px 24px; border-radius:0 0 24px 24px; }
+.header-in { max-width:600px; margin:auto; }
+.eyebrow { font-size:12px; font-weight:800; letter-spacing:.09em; color:#c6edda; }
+h1 { margin:5px 0 6px; font-size:31px; letter-spacing:-.06em; }
+header p { color:#c7ded2; margin:0; font-size:13px; }
+.progress { margin-top:19px; display:flex; gap:8px; align-items:center; font-size:12px; color:#dceade; }
+.track { flex:1; height:6px; background:#ffffff32; border-radius:20px; overflow:hidden; }
+.fill { height:100%; background:var(--gold); width:0%; transition:width .18s; }
+main { width:100%; max-width:600px; padding:16px 14px 35px; margin:auto; }
+.card { padding:20px 17px; background:white; border:1px solid var(--line); border-radius:18px; box-shadow:0 3px 12px #173a2908; margin-bottom:13px; }
+.heading { display:flex; align-items:flex-start; gap:10px; margin-bottom:13px; }
+.num { width:27px; height:27px; flex:none; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; color:white; background:var(--green); }
+h2 { margin:1px 0 0; font-size:17px; font-weight:800; line-height:1.4; letter-spacing:-.04em; }
+.hint { margin:4px 0 12px; font-size:13px; color:var(--muted); }
+.choices { display:flex; flex-wrap:wrap; gap:7px; }
+.choice { background:#f8fbf9; border:1px solid #d9e4dc; border-radius:11px; padding:10px 15px; font:inherit; font-size:14px; font-weight:700; color:#355047; min-width:72px; flex:1; cursor:pointer; }
+.choice.selected { border-color:var(--green); background:#eaf6ef; color:#0a6347; box-shadow:inset 0 0 0 1px var(--green); }
+.choice:disabled { opacity:.4; }
+.inputrow { display:flex; align-items:center; gap:10px; }
+.inputrow input { flex:1; min-width:0; width:100%; height:47px; padding:9px 12px; border:1px solid #cedbd2; border-radius:12px; font:inherit; font-size:17px; font-weight:700; color:var(--text); background:white; }
+input:focus { outline:2px solid #70b59c; outline-offset:0; border-color:#70b59c; }
+.unit { flex:none; font-weight:700; color:#50645a; }
+.subline { margin:9px 0 0; color:var(--muted); font-size:13px; }
+.mini-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin:15px 0 10px; }
+.metric { background:#eef5f1; border-radius:12px; padding:13px 11px; }
+.metric .k { color:#60756a; font-size:12px; }
+.metric .v { font-size:19px; font-weight:850; letter-spacing:-.04em; margin-top:3px; white-space:nowrap; }
+.stock { border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-top:9px; }
+.stock-title { padding:10px 13px; background:#fafcfb; font-weight:800; font-size:14px; border-bottom:1px solid var(--line); }
+.stock table { border-collapse:collapse; width:100%; }
+.stock td { padding:8px 13px; font-size:13px; border-bottom:1px solid #edf2ee; }
+.stock tr:last-child td { border-bottom:none; }
+.stock td:last-child { text-align:right; font-variant-numeric:tabular-nums; }
+.label { display:block; font-size:12px; color:var(--muted); font-weight:700; margin:8px 0 5px; }
+.status { display:none; margin-top:12px; border-radius:11px; padding:10px 11px; font-size:13px; font-weight:750; }
+.status.good { display:block; background:var(--mint); color:#136341; }
+.status.bad { display:block; background:var(--pink); color:var(--red); }
+.status.warn { display:block; background:var(--cream); color:var(--amber); }
+.notice { display:none; margin-top:13px; padding:12px; border:1px solid #eedcb3; background:var(--cream); border-radius:12px; }
+.notice.show { display:block; }
+.notice-title { font-weight:800; color:#84560e; margin-bottom:5px; }
+.notice-text { color:#755c36; font-size:13px; }
+.action { width:100%; border:0; color:white; background:var(--green); padding:11px; border-radius:10px; font-size:14px; font-weight:800; margin-top:10px; }
+.action:disabled { background:#9aaea6; }
+.hidden { display:none !important; }
+.money-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+.final { background:var(--dark); border:0; color:white; padding:23px 19px; }
+.final h2 { color:#fff; }
+.final-result { border-radius:13px; background:#ffffff17; padding:16px 12px; font-size:21px; font-weight:850; margin-top:14px; letter-spacing:-.03em; }
+.final-result.rejected { background:#572c32; color:#ffd5d8; }
+.final-result.ready { background:#1b654b; color:#e9ffec; }
+.final-result.pending { color:#e5eae7; }
+.final-details { margin-top:9px; font-size:12px; color:#f3c4c8; }
+.footer-btn { display:block; width:100%; padding:15px; font-size:15px; font-weight:800; border:1px solid #c9d8cf; background:white; color:#365549; border-radius:14px; }
+.footnote { text-align:center; color:var(--muted); font-size:11px; margin:15px 12px 5px; }
+</style>
+</head>
+<body>
+<header><div class="header-in">
+  <div class="eyebrow">CASH FIVE · STOCK CHECKLIST</div>
+  <h1>현금5억</h1>
+  <p>주식 매수 조건을 순서대로 확인하세요</p>
+  <div class="progress"><span id="progressText">0 / 9 확인</span><div class="track"><div class="fill" id="progressBar"></div></div></div>
+</div></header>
+<main>
+  <section class="card">
+    <div class="heading"><span class="num">0</span><h2>투자 원금 입력</h2></div>
+    <div class="inputrow"><input id="capital" type="number" min="0" inputmode="decimal" placeholder="1000"><span class="unit">만원</span></div>
+    <p class="subline" id="capitalResult">총 원금: 10,000,000원</p>
+  </section>
+
+  <section class="card">
+    <div class="heading"><span class="num">1</span><h2>시장상황 체크</h2></div>
+    <div class="choices" data-group="market"><button type="button" class="choice" data-value="weak">약세장</button><button type="button" class="choice" data-value="strong">강세장</button></div>
+    <div class="mini-grid">
+      <div class="metric"><div class="k" id="investmentLabel">총 투자금 (70%)</div><div class="v" id="investment">700만원</div></div>
+      <div class="metric"><div class="k">현금 보유</div><div class="v" id="cash">300만원</div></div>
+    </div>
+    <p class="hint">투자금을 두 종목에 동일하게 배분합니다.</p>
+    <div class="stock"><div class="stock-title">종목 1</div><table>
+      <tr><td>배정금</td><td id="s1all">350만원</td></tr>
+      <tr><td id="s1firstLabel">1차 매수 (40%)</td><td id="s1first">140만원</td></tr>
+      <tr><td id="s1secondLabel">2차 매수 (60%)</td><td id="s1second">210만원</td></tr>
+    </table></div>
+    <div class="stock"><div class="stock-title">종목 2</div><table>
+      <tr><td>배정금</td><td id="s2all">350만원</td></tr>
+      <tr><td id="s2firstLabel">1차 매수 (40%)</td><td id="s2first">140만원</td></tr>
+      <tr><td id="s2secondLabel">2차 매수 (60%)</td><td id="s2second">210만원</td></tr>
+    </table></div>
+  </section>
+
+  <section class="card">
+    <div class="heading"><span class="num">2</span><h2>테마점수 확인</h2></div>
+    <p class="hint">신선한 재료, 실체 없는 기대감, 최근 3거래일 상한가 5개 또는 15% 급등 10개, 하루 상한가 3개</p>
+    <div class="choices" data-group="theme"><button type="button" class="choice" data-value="3">3점</button><button type="button" class="choice" data-value="2">2점</button><button type="button" class="choice" data-value="1">1점</button><button type="button" class="choice" data-value="pending">미선택</button></div>
+    <div class="status" id="themeStatus"></div>
+  </section>
+
+  <section class="card">
+    <div class="heading"><span class="num">3</span><h2>상승테마가 현재 약세장과 관련 있는 테마인지?</h2></div>
+    <div class="choices" data-group="related"><button type="button" class="choice" data-value="yes">YES</button><button type="button" class="choice" data-value="no">NO</button><button type="button" class="choice" data-value="pending">미선택</button></div>
+    <div class="status" id="relatedStatus"></div>
+  </section>
+
+  <section class="card">
+    <div class="heading"><span class="num">4</span><h2>테마 내 3등주 이내 종목인지?</h2></div>
+    <div class="choices" data-group="rank"><button type="button" class="choice" data-value="yes">YES</button><button type="button" class="choice" data-value="no">NO</button><button type="button" class="choice" data-value="pending">미선택</button></div>
+    <div class="status" id="rankStatus"></div>
+  </section>
+
+  <section class="card">
+    <div class="heading"><span class="num">5</span><h2>세력 평단가 확인</h2></div>
+    <div class="choices" data-group="avgChecked"><button type="button" class="choice" data-value="yes">YES</button><button type="button" class="choice" data-value="no">NO</button><button type="button" class="choice" data-value="pending">미선택</button></div>
+    <div class="status" id="avgCheckedStatus"></div>
+  </section>
+
+  <section class="card">
+    <div class="heading"><span class="num">6</span><h2>세력 평단 위치</h2></div>
+    <p class="hint">기준봉 시가와 비교합니다. 5번 YES 선택 시 활성화됩니다.</p>
+    <div class="choices" data-group="avgPosition"><button type="button" class="choice" data-value="above">위</button><button type="button" class="choice" data-value="below">아래</button><button type="button" class="choice" data-value="pending">미선택</button></div>
+    <div class="status" id="avgPositionStatus"></div>
+  </section>
+
+  <section class="card">
+    <div class="heading"><span class="num">7</span><h2>시가총액 확인</h2></div>
+    <div class="inputrow"><input id="cap" type="number" min="0" inputmode="decimal" placeholder="예: 800"><span class="unit">억원</span></div>
+    <div class="notice" id="capNotice"><div class="notice-title" id="capNoticeTitle"></div><div class="notice-text" id="capNoticeText"></div><button type="button" class="action" id="capAck">확인</button></div>
+    <div class="status" id="capStatus"></div>
+  </section>
+
+  <section class="card">
+    <div class="heading"><span class="num">8</span><h2>기준봉 다음날 거래량 확인</h2></div>
+    <p class="hint" id="volumeGuide">7번 시가총액 입력 및 주의사항 확인 후 진행합니다.</p>
+    <div id="volumeInputBox" class="hidden"><label class="label" for="vol">기준봉 대비 다음날 거래량 비율</label><div class="inputrow"><input id="vol" type="number" min="0" inputmode="decimal" placeholder="예: 60"><span class="unit">%</span></div></div>
+    <div class="status" id="volStatus"></div>
+    <div class="notice" id="volNotice"><div class="notice-title">⚠ 매수 주의</div><div class="notice-text">웬만하면 사지 말되, 사게 되면 12시까지 세력 기준가 깨는지 확인 필요</div><p class="subline" id="volValue"></p><button type="button" class="action" id="volAck">경고 확인</button></div>
+  </section>
+
+  <section class="card">
+    <div class="heading"><span class="num">9</span><h2>매수가 및 손절가 계산</h2></div>
+    <div class="money-grid">
+      <div><label class="label" for="open">기준봉 시가 (원)</label><div class="inputrow"><input id="open" type="number" min="0" inputmode="decimal" placeholder="10000"></div></div>
+      <div><label class="label" for="close">기준봉 종가 (원)</label><div class="inputrow"><input id="close" type="number" min="0" inputmode="decimal" placeholder="15000"></div></div>
+    </div>
+    <div class="mini-grid"><div class="metric"><div class="k">중간 매수가</div><div class="v" id="midpoint">-</div></div><div class="metric"><div class="k">손절가 (-4%)</div><div class="v" id="stop">-</div></div></div>
+    <p class="subline" id="priceGuide"></p>
+  </section>
+
+  <section class="card">
+    <div class="heading"><span class="num">10</span><h2>대장주 주가 확인</h2></div>
+    <div class="choices" data-group="leader"><button type="button" class="choice" data-value="yes">확인 완료</button><button type="button" class="choice" data-value="no">재확인 필요</button><button type="button" class="choice" data-value="pending">미확인</button></div>
+  </section>
+
+  <section class="card final" id="finalCard">
+    <div class="heading"><span class="num" style="background:#e7bd61;color:#143729">✓</span><h2>최종 매수 판단</h2></div>
+    <div class="final-result pending" id="finalResult">체크 항목 확인 중</div>
+    <div class="final-details" id="finalDetails"></div>
+  </section>
+  <button class="footer-btn" id="reset" type="button">↻ 처음부터 다시 시험하기</button>
+  <p class="footnote">개인 체크리스트용 · 투자 결과를 보장하지 않으며 실제 주문은 실행하지 않습니다.</p>
+</main>
+<script>
+(function(){
+'use strict';
+const defaults={capital:'1000',market:'weak',theme:'pending',related:'pending',rank:'pending',avgChecked:'pending',avgPosition:'pending',cap:'',capAck:false,vol:'',warningAck:false,open:'',close:'',leader:'pending'};
+const fields=['capital','cap','vol','open','close'];
+const choiceFields=['market','theme','related','rank','avgChecked','avgPosition','leader'];
+let state={...defaults};
+try {
+  const data=window.CashFiveStorage?JSON.parse(window.CashFiveStorage.load()):JSON.parse(localStorage.getItem('cash5')||'{}');
+  for (const key of Object.keys(defaults)) if (data && Object.prototype.hasOwnProperty.call(data,key) && typeof data[key]===typeof defaults[key]) state[key]=data[key];
+} catch(e) { /* defaults */ }
+function byId(id){return document.getElementById(id)}
+function save(){
+ const data=JSON.stringify(state);
+ try { if(window.CashFiveStorage) window.CashFiveStorage.save(data); else localStorage.setItem('cash5',data); } catch(e) {}
+}
+function numeric(s){if(s===''||s===null||s===undefined)return null; const n=Number(s);return Number.isFinite(n)&&n>=0?n:null;}
+function krw(n){return Math.round(n).toLocaleString('ko-KR')+'원'}
+function man(n){return Number((n/10000).toFixed(2)).toLocaleString('ko-KR',{maximumFractionDigits:2})+'만원'}
+function txt(id,value){byId(id).textContent=value}
+function status(id,text,kind){const el=byId(id);el.className='status'+(text?' '+kind:'');el.textContent=text||'';}
+function render(){
+ const principal=(numeric(state.capital)||0)*10000;
+ const rate=state.market==='weak'?.7:1,first=state.market==='weak'?.4:.6;
+ const perStock=principal*rate/2;
+ txt('capitalResult','총 원금: '+krw(principal));
+ txt('investmentLabel','총 투자금 ('+(rate*100)+'%)');txt('investment',man(principal*rate));txt('cash',man(principal*(1-rate)));
+ for(const i of [1,2]){txt('s'+i+'all',man(perStock));txt('s'+i+'firstLabel','1차 매수 ('+(first*100)+'%)');txt('s'+i+'first',man(perStock*first));txt('s'+i+'secondLabel','2차 매수 ('+((1-first)*100)+'%)');txt('s'+i+'second',man(perStock*(1-first)));}
+ for(const group of choiceFields){for(const b of document.querySelectorAll('[data-group="'+group+'"] .choice')){
+   b.classList.toggle('selected',b.dataset.value===state[group]);
+   b.disabled=group==='avgPosition'&&state.avgChecked!=='yes';
+ }}
+ const themePass=state.theme==='2'||state.theme==='3';
+ status('themeStatus',state.theme==='pending'?'':themePass?'✓ 테마 조건 통과':'⚠ 테마점수 미달',themePass?'good':'warn');
+ status('relatedStatus',state.related==='pending'?'':state.related==='yes'?'✕ 종목 탈락 — 매수 대상 제외':'✓ 통과 — 다음 단계 진행',state.related==='yes'?'bad':'good');
+ status('rankStatus',state.rank==='pending'?'':state.rank==='yes'?'✓ 통과':'✕ 종목 탈락 — 매수 대상 제외',state.rank==='yes'?'good':'bad');
+ status('avgCheckedStatus',state.avgChecked==='no'?'⚠ 세력 평단가 확인 필요':state.avgChecked==='yes'?'✓ 확인 완료':'',state.avgChecked==='yes'?'good':'warn');
+ status('avgPositionStatus',state.avgChecked!=='yes'||state.avgPosition==='pending'?'':state.avgPosition==='below'?'✕ 종목 탈락':'✓ 평단 조건 통과',state.avgPosition==='above'?'good':'bad');
+ const cap=numeric(state.cap), capValid=cap!==null, small=capValid&&cap<700;
+ byId('capNotice').classList.toggle('show',capValid&&!state.capAck);
+ txt('capNoticeTitle',small?'⚠ 변동성 주의':'⚠ 거래량 주의');
+ txt('capNoticeText',small?'시가총액 700억 미만입니다. 주가 변동성에 주의하세요.':'시가총액 700억 이상입니다. 다음날 거래량을 확인하세요.');
+ status('capStatus',capValid&&state.capAck?'✓ 주의사항 확인 완료':'', 'good');
+ const canVolume=capValid&&state.capAck;
+ const vol=numeric(state.vol), volValid=vol!==null;
+ const volWarning=canVolume&&!small&&volValid&&vol>=50;
+ byId('volumeInputBox').classList.toggle('hidden',!canVolume||small);
+ byId('volNotice').classList.toggle('show',volWarning);
+ txt('volumeGuide',!canVolume?'7번 시가총액 입력 및 주의사항 확인 후 진행합니다.':small?'시총 700억 미만: 거래량 입력 없이 자동 통과':'시총 700억 이상: 거래량 50% 미만이면 통과');
+ txt('volValue','기준봉 대비 다음날 거래량: '+(volValid?vol:'-')+'%');
+ byId('volAck').disabled=!!state.warningAck;txt('volAck',state.warningAck?'경고 확인 완료':'경고 확인');
+ status('volStatus',!canVolume?'':small?'✓ 자동 통과 — 거래량 관계없음':volWarning?'':volValid?'✓ 거래량 조건 통과':'', 'good');
+ const o=numeric(state.open),c=numeric(state.close), priceValid=o!==null&&c!==null&&o>0&&c>0;
+ const mid=priceValid?(o+c)/2:0;
+ txt('midpoint',priceValid?krw(mid):'-');txt('stop',priceValid?krw(mid*.96):'-');
+ txt('priceGuide',capValid?(small?'시총 700억 미만: 중간값 이하 매수 가능':'시총 700억 이상: 중간값 기준 매수'):'');
+ const rejected=state.related==='yes'||state.rank==='no'||(state.avgChecked==='yes'&&state.avgPosition==='below');
+ const volPass=canVolume&&(small||(volValid&&vol<50));
+ const allPass=themePass&&state.related==='no'&&state.rank==='yes'&&state.avgChecked==='yes'&&state.avgPosition==='above'&&volPass&&priceValid&&state.leader==='yes';
+ const result=byId('finalResult');
+ result.className='final-result '+(rejected?'rejected':allPass?'ready':'pending');
+ txt('finalResult',rejected?'종목 탈락 — 매수 대상 제외':allPass?'매수 검토해봐':'체크 항목 확인 중');
+ let reasons=[];
+ if(state.related==='yes')reasons.push('3번: 약세장 관련 상승테마');
+ if(state.rank==='no')reasons.push('4번: 테마 내 3등주 이내가 아님');
+ if(state.avgChecked==='yes'&&state.avgPosition==='below')reasons.push('6번: 세력 평단 위치 기준 미충족');
+ txt('finalDetails',rejected?reasons.join(' · '):'');
+ const completed=(themePass?1:0)+(state.related!=='pending'?1:0)+(state.rank!=='pending'?1:0)+(state.avgChecked==='yes'?1:0)+(state.avgPosition!=='pending'?1:0)+(canVolume?1:0)+(volPass?1:0)+(priceValid?1:0)+(state.leader==='yes'?1:0);
+ txt('progressText',Math.min(9,completed)+' / 9 확인');byId('progressBar').style.width=(Math.min(9,completed)/9*100)+'%';
+}
+for(const name of fields){byId(name).value=state[name];byId(name).addEventListener('input',function(){state[name]=this.value;if(name==='cap'){state.capAck=false;state.vol='';state.warningAck=false;byId('vol').value='';} if(name==='vol')state.warningAck=false; save();render();});}
+for(const b of document.querySelectorAll('[data-group] .choice')) b.addEventListener('click',function(){const group=this.parentNode.dataset.group;state[group]=this.dataset.value;if(group==='avgChecked'&&state[group]!=='yes')state.avgPosition='pending';save();render();});
+byId('capAck').addEventListener('click',()=>{state.capAck=true;save();render()});
+byId('volAck').addEventListener('click',()=>{state.warningAck=true;save();render()});
+byId('reset').addEventListener('click',()=>{state={...defaults};for(const k of fields)byId(k).value=state[k];save();render();window.scrollTo(0,0)});
+render();
+})();
+</script>
+</body>
+</html>
